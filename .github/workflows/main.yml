@@ -2,7 +2,7 @@ name: CI/CD
 # 触发条件为 push
 on: [push] # 执行时机
 # 任务
-jobs:
+jobs:  
   test:
     # 运行的环境
     runs-on: ubuntu-latest
