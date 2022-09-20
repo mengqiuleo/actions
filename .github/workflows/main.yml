@@ -18,7 +18,7 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t actions:latest  .
           docker tag actions:latest ${{ secrets.DOCKER_REPOSITORY }}
-          docker push ${{ secrets.DOCKER_REPOSITORY }}
+          docker push ${{ secrets.DOCKER_REPOSITORY }}:latest
 
       - name: 登录服务器, 执行脚本
         uses: appleboy/ssh-action@master
