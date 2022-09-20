@@ -26,5 +26,5 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: root
           password: ${{ secrets.SSH_PASSWORD }}
-          # 执行脚本
-          script: cd ~ && sh deploy.sh
+          # # 执行脚本
+          # script: cd ~ && sh deploy.sh
