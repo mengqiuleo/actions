@@ -21,7 +21,7 @@ jobs:
     # 打包镜像推送到阿里云容器镜像服务
     - name: 打包镜像
       run: |
-        docker login --username=${{ secrets.DOCKER_USERNAME }} registry.cn-shanghai.aliyuncs.com --password=${{ secrets.DOCKER_PASSWORD }}
+        winpty docker login --username=${{ secrets.DOCKER_USERNAME }} registry.cn-shanghai.aliyuncs.com --password=${{ secrets.DOCKER_PASSWORD }}
         docker build -t admin:latest .
         docker tag admin registry.cn-shanghai.aliyuncs.com/pjy_github/action:latest
         docker push registry.cn-shanghai.aliyuncs.com/pjy_github/action:latest # 推送
