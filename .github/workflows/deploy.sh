@@ -9,7 +9,7 @@ docker rm actions
 docker rmi mengqiuleo/actions-image:latest
 
 
-docker run --name actions -d -p 5555:80 mengqiuleo/actions-image:latest
+docker run -d -p 5555:80 --name actions mengqiuleo/actions-image:latest
 
 
 # docker image prune -f
