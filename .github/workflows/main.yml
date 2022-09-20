@@ -1,40 +1,46 @@
-name: Docker Image CI/CD # workflow名称，可以随意改
+name: Docker Image CI # Actions名称
 on: [push] # 执行时机
 
 jobs:
-  build: # 打包并上传docker镜像
-    runs-on: ubuntu-latest # 依赖的环境      
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build Image
-      # ${{ secrets.DOCKER_REPOSITORY }}是读取之前在Secret创建的名为DOCKER_REPOSITORY的值
-        run: docker build -t ${{ secrets.DOCKER_REPOSITORY }}:latest ./ # 打包并docker镜像，版本为latest
-      - name: Login to Registry # 登录阿里云镜像服务器
-        run: docker login --username=${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} registry.cn-shanghai.aliyuncs.com
-      - name: Push Image # 推送镜像，设置版本为latest
-        run: docker push ${{ secrets.DOCKER_REPOSITORY }}:latest
-  pull-docker: # docker部署
-    needs: [build]
-    name: Pull Docker
+# 这里我使用的是yarn，想用npm的同学将yarn命令修改为npm命令即可
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }} # 服务器ip
-          username: ${{ secrets.HOST_USERNAME }} # 服务器登录用户名
-          password: ${{ secrets.HOST_PASSWORD }} # 服务器登录密码
-          script: |
-          	# 停止旧版容器
-            docker stop $(docker ps --filter ancestor=${{ secrets.DOCKER_REPOSITORY }} -q)
-            # 删除旧版容器
-            docker rm -f $(docker ps -a --filter ancestor=${{ secrets.DOCKER_REPOSITORY }}:latest -q)
-            # 删除旧版镜像
-            docker rmi -f $(docker images ${{ secrets.DOCKER_REPOSITORY }}:latest -q)
-            # 登录阿里云镜像服务器
-            docker login --username=${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} registry.cn-shanghai.aliyuncs.com
-            # 拉取最新latest版本镜像
-            docker pull ${{ secrets.DOCKER_REPOSITORY }}:latest
-            # 运行最新latest版本镜像
-            docker run -d -p 5555:80 ${{ secrets.DOCKER_REPOSITORY }}:latest
+    - name: 迁出代码
+    # 使用action库  actions/checkout获取源码
+      uses: actions/checkout@master
 
+    # 安装依赖
+    - name: install
+      run: npm install
+
+    # 打包
+    - name: 打包
+      run: npm run build
+
+    # 登录阿里云
+    - name: Publish to Aliyun Container Repository
+      uses: aliyun/acr-login@v1
+      with:
+        login-server: registry.cn-shanghai.aliyuncs.com # 务必正确填写镜像容器服务的登录地址
+        region-id: cn-shanghai # 务必正确填写镜像容器服务的登录地址
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # 打包镜像推送到阿里云容器镜像服务
+    # 打包并docker镜像，版本为latest
+    - name: 打包镜像
+      run: |
+        docker build -t ${{ secrets.DOCKER_REPOSITORY }}:latest ./ 
+    
+    - name: push image
+      run: docker push ${{ secrets.DOCKER_REPOSITORY }}:latest
+
+    # 使用appleboy/ssh-action@master登录服务器执行拉取镜像脚本，服务器ip、用户名、密码配置方式同容器镜像服务配置方式一样
+    - name: ssh docker login 
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}   
+        username: ${{ secrets.SSH_USERNAME }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        script: cd ~ && sh deploy.sh ${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_PASSWORD }}
