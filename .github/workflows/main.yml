@@ -28,11 +28,14 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     # 打包镜像推送到阿里云容器镜像服务
+    # 打包并docker镜像，版本为latest
     - name: 打包镜像
       run: |
-        docker build -t admin:latest .
-        docker tag admin registry.cn-shanghai.aliyuncs.com/pjy_github/actions:latest
-        docker push registry.cn-shanghai.aliyuncs.com/pjy_github/actions:latest 
+        docker build -t ${{ secrets.DOCKER_REPOSITORY }}:latest ./ 
+    
+    - name: push image
+      run: docker push ${{ secrets.DOCKER_REPOSITORY }}:latest
+
     # 使用appleboy/ssh-action@master登录服务器执行拉取镜像脚本，服务器ip、用户名、密码配置方式同容器镜像服务配置方式一样
     - name: ssh docker login 
       uses: appleboy/ssh-action@master
