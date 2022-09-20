@@ -32,7 +32,6 @@ jobs:
     - name: 打包镜像
       run: |
         docker build -t actions:latest . 
-        docker tag actions:latest registry.cn-shanghai.aliyuncs.com/pjy_github/actions:latest
     
     - name: push image
       run: docker push registry.cn-shanghai.aliyuncs.com/pjy_github/actions:latest 
