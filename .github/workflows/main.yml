@@ -33,7 +33,8 @@ jobs:
         docker build -t admin:latest .
         docker tag admin registry.cn-shanghai.aliyuncs.com/pjy_github/actions:latest
         docker push registry.cn-shanghai.aliyuncs.com/pjy_github/actions:latest 
-    - name: ssh docker login # 使用appleboy/ssh-action@master登录服务器执行拉取镜像脚本，服务器ip、用户名、密码配置方式同容器镜像服务配置方式一样
+    # 使用appleboy/ssh-action@master登录服务器执行拉取镜像脚本，服务器ip、用户名、密码配置方式同容器镜像服务配置方式一样
+    - name: ssh docker login 
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SSH_HOST }}   
