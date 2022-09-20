@@ -31,11 +31,11 @@ jobs:
     # 打包并docker镜像，版本为latest
     - name: 打包镜像
       run: |
-        docker build -t ${{ secrets.DOCKER_REPOSITORY }} . 
-        docker tag ${{ secrets.DOCKER_REPOSITORY }} registry.cn-shanghai.aliyuncs.com/pjy_github/${{ secrets.DOCKER_REPOSITORY }}:latest
+        docker build -t actions:latest . 
+        docker tag actions registry.cn-shanghai.aliyuncs.com/pjy_github/actions:latest
     
     - name: push image
-      run: docker push registry.cn-shanghai.aliyuncs.com/pjy_github/${{ secrets.DOCKER_REPOSITORY }}:latest 
+      run: docker push registry.cn-shanghai.aliyuncs.com/pjy_github/actions:latest 
 
     # 使用appleboy/ssh-action@master登录服务器执行拉取镜像脚本，服务器ip、用户名、密码配置方式同容器镜像服务配置方式一样
     - name: ssh docker login 
