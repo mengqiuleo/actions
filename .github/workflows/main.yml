@@ -27,5 +27,4 @@ jobs:
           username: root
           password: ${{ secrets.SSH_PASSWORD }}
           # 执行脚本
-          script: |
-            ./deploy.sh
+          script: cd ~ && sh deploy.sh
